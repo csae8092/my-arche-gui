@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
-from .arche_settings import ARCHE_API
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -54,23 +52,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms',
-    'django_filters',
     'django_tables2',
-    'django_spaghetti',
     'django_extensions',
     'arche',
 ]
 
-CRISPY_TEMPLATE_PACK = "bootstrap4"
-
-SPAGHETTI_SAUCE = {
-    'apps': [
-        'infos',
-    ],
-    'show_fields': False,
-    'exclude': {'auth': ['user']},
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -95,11 +81,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'webpage.webpage_content_processors.installed_apps',
-                'webpage.webpage_content_processors.is_dev_version',
-                'webpage.webpage_content_processors.get_db_name',
-                "webpage.webpage_content_processors.shared_url",
-                "webpage.webpage_content_processors.my_app_name",
             ],
         },
     },
@@ -173,3 +154,5 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ARCHE_API = os.environ.get("ARCHE_API", 'https://arche.acdh.oeaw.ac.at/api/')

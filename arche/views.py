@@ -13,19 +13,19 @@ class TopColListView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # lang = self.request.GET.get('lang')
-        # params = {
-        #     "property[0]": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        #     "value[0]": "https://vocabs.acdh.oeaw.ac.at/schema#TopCollection",
-        #     # "property[1]": "https://vocabs.acdh.oeaw.ac.at/schema%23hasTitle",
-        #     # "language[1]": f"{lang}",
-        # }
-        # g = fetch_data(params=params, read_mode='resource')
-        # g = g.query(TOP_COL_SIMPLE)
-        # top_cols = top_col_dict(g, lang)
-        # context["top_cols"] = [value for _, value in top_cols.items()]
-        # with open('hansi.json', 'w') as file:
-        #     json.dump(top_cols, file, ensure_ascii=False)
+        lang = self.request.GET.get('lang')
+        params = {
+            "property[0]": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "value[0]": "https://vocabs.acdh.oeaw.ac.at/schema#TopCollection",
+            # "property[1]": "https://vocabs.acdh.oeaw.ac.at/schema%23hasTitle",
+            # "language[1]": f"{lang}",
+        }
+        g = fetch_data(params=params, read_mode='resource')
+        g = g.query(TOP_COL_SIMPLE)
+        top_cols = top_col_dict(g, lang)
+        context["top_cols"] = [value for _, value in top_cols.items()]
+        with open('hansi.json', 'w') as file:
+            json.dump(top_cols, file, ensure_ascii=False)
         with open("hansi.json", "r") as file:
             top_cols = json.load(file)
         context["top_cols"] = [value for _, value in top_cols.items()]

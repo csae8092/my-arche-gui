@@ -36,6 +36,7 @@ WHERE {
 }
 """
 
+
 def extract_arche_id(uri):
     arche_id = uri.split('/')[-1]
     return arche_id
@@ -57,7 +58,7 @@ def fetch_label_form_arche_id(g, arche_id):
     labels = []
     for x in qres:
         labels.append(
-                {
+            {
                 'label': f"{x[0]}",
                 'label__lang': x[0].language,
                 'arche_id': arche_id
@@ -142,7 +143,7 @@ def resource_to_dict(g):
     all_dict = {}
     for i, gdf in df.groupby('uri'):
         records = gdf.to_dict(orient='records')
-        my_dict = [{k:v for k, v in x.items() if v == v } for x in records]
+        my_dict = [{k: v for k, v in x.items() if v == v} for x in records]
         item = defaultdict(list)
         for x in my_dict:
             item[x['property__name']].append(x)
