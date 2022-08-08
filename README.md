@@ -1,6 +1,8 @@
+[![flake8 Lint](https://github.com/csae8092/my-arche-gui/actions/workflows/lint.yml/badge.svg)](https://github.com/csae8092/my-arche-gui/actions/workflows/lint.yml)
+
 # My ARCHE GUI
 
-short description of the project
+A django/python based read-only-gui based upon the ARCHE-API. The purpose of this repo is mainly to get acquainted to ARCHE's API.
 
 ## install
 
@@ -8,14 +10,12 @@ short description of the project
 * change into the project's root directory e.g. `cd my-arche-gui`
 * create a virtual environment e.g. `virutalenv env` and activate it `source env/bin/activate`
 * install required packages `pip install -r requirements_dev.txt`
-* run migrations `python manage.py migrate`
-* start the dev sever `python manage.py runserver`
 * go to [http://127.0.0.1:8000](http://127.0.0.1:8000/) and check if everything works
 
 
 ## Docker
 
-At the ACDH-CH we use a centralized database-server. So instead of spawning a database for each service our services are talking to a database on this centralized db-server. This setup is reflected in the dockerized setting as well, meaning it expects an already existing database (either on your host, e.g. accessible via 'localhost' or some remote one)
+`./build_and_run.sh`
 
 ### building the image
 
