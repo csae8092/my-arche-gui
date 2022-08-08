@@ -133,3 +133,6 @@ env.secret
 search.js
 hansi.*
 fuseki/
+asdf__*
+Untitled1.ipynb
+*.ipynb
