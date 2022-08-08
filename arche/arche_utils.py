@@ -42,7 +42,7 @@ def extract_arche_id(uri):
     return arche_id
 
 
-def fetch_label_form_arche_id(g, arche_id):
+def fetch_label_form_arche_id(g, arche_id, lang=None):
     sparql_query = f"""
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -64,6 +64,8 @@ def fetch_label_form_arche_id(g, arche_id):
                 'arche_id': arche_id
             }
         )
+    if lang:
+        labels = [x for x in labels if x['label__lang'] == lang]
     return labels
 
 
@@ -117,14 +119,14 @@ def fetch_data(url=ARCHE_SEARCH, params={}, read_mode='neighbors'):
     return g
 
 
-def yield_triples(g):
+def yield_triples(g, lang=None):
     for s, p, o in g:
         p = p.split('#')[-1]
         arche_id = extract_arche_id(s)
         property__object = False
         if f"{o}".startswith(ARCHE_API):
             cur_arche_id = extract_arche_id(f"{o}")
-            property__object = fetch_label_form_arche_id(g, cur_arche_id)
+            property__object = fetch_label_form_arche_id(g, cur_arche_id, lang=lang)
 
         item = {
             "uri": f"{s}",
@@ -138,8 +140,8 @@ def yield_triples(g):
         yield item
 
 
-def resource_to_dict(g):
-    df = pd.DataFrame.from_records(yield_triples(g))
+def resource_to_dict(g, lang=None):
+    df = pd.DataFrame.from_records(yield_triples(g, lang=lang))
     all_dict = {}
     for i, gdf in df.groupby('uri'):
         records = gdf.to_dict(orient='records')
@@ -149,3 +151,15 @@ def resource_to_dict(g):
             item[x['property__name']].append(x)
         all_dict[extract_arche_id(i)] = item
     return all_dict
+
+
+def filter_by_lang(data: dict, lang: str = None):
+    new_data = {}
+    if not lang:
+        new_data = data
+    else:
+        for key, value in data.items():
+            new_data[key] = [x for x in value if x['property__lang'] == lang]
+            if not new_data[key]:
+                new_data[key] = value
+    return new_data
