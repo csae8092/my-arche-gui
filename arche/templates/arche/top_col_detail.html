@@ -1,0 +1,53 @@
+{% extends "arche/base.html" %}
+{% load static %}
+{% block title %} {{ object.title }} {% endblock %}
+{% block content %}
+<div class="container">
+    <div class="card imprint">
+        <div class="card-header">
+            <h1 style="text-align: center;">
+                {% if lang %}
+                {% for x in object.hasTitle %}
+                    {% if x.property__lang == lang %}
+                    {{ x.property__value }}
+                    {% endif %}
+                {% endfor %}
+                {% else %}
+                {{ object.hasTitle }}
+                {% endif %}
+            </h1>
+        </div>
+        <div class="card-body">
+            <p>
+                {% for x in object.hasDescription %}
+                    {% if x.property__lang == lang %}
+                        {{ x.property__value }}
+                    {% endif %}
+                {% endfor %}
+            </p>
+           
+            <ul>
+                {% for key, value in object.items %}
+                    
+                <li>
+                    {{ key }}
+                    <ul>
+                    {% for y in value %}
+                        {% if y.property__object %}
+                            {% for label in y.property__object %}
+                            <li>
+                                <a href="{{ label.arche_id }}">{{ label.label }} <small>{{label.label__lang}}</small></a>
+                            </li>
+                            {% endfor %}
+                        {% else %}
+                        <li>{{ y.property__value }}</li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

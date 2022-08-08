@@ -1,0 +1,32 @@
+{% extends "arche/base.html" %}
+{% load static %}
+{% load django_tables2 %}
+
+{% block title %} Arche TopCols {% endblock %}
+{% block content %}
+<div class="container">
+    <div class="card imprint">
+        <div class="card-body">
+            <h1 style="text-align: center;">
+                {{ top_cols|length }} Top - Collections
+            </h1>
+            <div class="row">
+                {% for x in top_cols %}
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header" style="text-align: center;">
+                            <img src="{{ x.arche_thumb }}" loading="lazy"/>
+                            <h3><a href="{% url 'arche:top_col_detail' arche_id=x.arche_id %}{% querystring %}">{{ x.title }}</a></h3>
+                            
+                        </div>
+                        <div class="card-body">
+                            <p>{{ x.description|truncatechars:250 }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
