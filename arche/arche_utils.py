@@ -25,18 +25,6 @@ WHERE {
 """
 
 
-LABEL_QUERY = """
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX arche: <https://arche.acdh.oeaw.ac.at/api/>
-
-SELECT  ?subject ?title
-WHERE {
-  arche:28107 acdh:hasTitle ?title .
-}
-"""
-
-
 def extract_arche_id(uri):
     arche_id = uri.split('/')[-1]
     return arche_id
@@ -114,6 +102,9 @@ def fetch_data(url=ARCHE_SEARCH, params={}, read_mode='neighbors'):
         url, params=params, headers=headers
     )
     print(url)
+    with open('hansi.txt', 'w') as f:
+        print(r.text, file=f)
+    print(r.text)
     g = Graph().parse(data=r.text, format="nt")
     print(len(g))
     return g
