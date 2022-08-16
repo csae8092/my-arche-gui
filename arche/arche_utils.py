@@ -25,6 +25,19 @@ WHERE {
 """
 
 
+X_RESOURCE_PROPERTIES = [
+    "https://vocabs.acdh.oeaw.ac.at/schema#hasTitle",
+    "https://vocabs.acdh.oeaw.ac.at/schema#hasDescription",
+    # "https://vocabs.acdh.oeaw.ac.at/schema#hasUpdatedDate",
+    # "https://vocabs.acdh.oeaw.ac.at/schema#hasCategory",
+    # "https://vocabs.acdh.oeaw.ac.at/schema#isPartOf"
+]
+
+X_RELATIVES_PROPERTIES = [
+    "https://vocabs.acdh.oeaw.ac.at/schema#hasTitle",
+]
+
+
 def extract_arche_id(uri):
     arche_id = uri.split('/')[-1]
     return arche_id
@@ -102,9 +115,9 @@ def fetch_data(url=ARCHE_SEARCH, params={}, read_mode='neighbors'):
         url, params=params, headers=headers
     )
     print(url)
-    with open('hansi.txt', 'w') as f:
-        print(r.text, file=f)
-    print(r.text)
+    # with open('hansi.txt', 'w') as f:
+    #     print(r.text, file=f)
+    # print(r.text)
     g = Graph().parse(data=r.text, format="nt")
     print(len(g))
     return g
@@ -114,21 +127,22 @@ def yield_triples(g, lang=None):
     for s, p, o in g:
         p = p.split('#')[-1]
         arche_id = extract_arche_id(s)
-        property__object = False
-        if f"{o}".startswith(ARCHE_API):
-            cur_arche_id = extract_arche_id(f"{o}")
-            property__object = fetch_label_form_arche_id(g, cur_arche_id, lang=lang)
+        if arche_id:
+            property__object = False
+            if f"{o}".startswith(ARCHE_API):
+                cur_arche_id = extract_arche_id(f"{o}")
+                property__object = fetch_label_form_arche_id(g, cur_arche_id, lang=lang)
 
-        item = {
-            "uri": f"{s}",
-            "arche_id": arche_id,
-            "property__name": f"{p}",
-            "property__value": f"{o}",
-            "property__type": f"{type(o)}",
-            "property__lang": getattr(o, 'language', None),
-            "property__object": property__object
-        }
-        yield item
+            item = {
+                "uri": f"{s}",
+                "arche_id": arche_id,
+                "property__name": f"{p}",
+                "property__value": f"{o}",
+                "property__type": f"{type(o)}",
+                "property__lang": getattr(o, 'language', None),
+                "property__object": property__object
+            }
+            yield item
 
 
 def resource_to_dict(g, lang=None):
@@ -140,7 +154,7 @@ def resource_to_dict(g, lang=None):
         item = defaultdict(list)
         for x in my_dict:
             item[x['property__name']].append(x)
-        all_dict[extract_arche_id(i)] = item
+        all_dict[extract_arche_id(i)] = dict(item)
     return all_dict
 
 
@@ -154,3 +168,33 @@ def filter_by_lang(data: dict, lang: str = None):
             if not new_data[key]:
                 new_data[key] = value
     return new_data
+
+
+def fetch_children(
+    parent_id: str, lang: str = None,
+    arche_search_api: str = ARCHE_SEARCH,
+    arche_base: str = ARCHE_API,
+    x_resource_properties: list = X_RESOURCE_PROPERTIES,
+    x_relatives_properties: list = X_RELATIVES_PROPERTIES
+):
+    url = arche_search_api
+    parent_resource = f"{arche_base}{parent_id}"
+    params = {
+        "property[0]": "https://vocabs.acdh.oeaw.ac.at/schema#isPartOf",
+        "value[0]": parent_resource
+    }
+    headers = {
+        'X-META-READ-MODE': '0_0_1_0',
+        'X-RESOURCE-PROPERTIES': ", ".join(x_resource_properties),
+        'X-RELATIVES-PROPERTIES': ", ".join(x_relatives_properties),
+        'Accept': 'application/n-triples'
+    }
+
+    r = requests.request("GET", url, headers=headers, params=params)
+    print(f"fetching data from {r.url}")
+    g = Graph().parse(data=r.text, format="n3")
+    try:
+        result = resource_to_dict(g, lang=lang)
+    except KeyError:
+        result = {}
+    return result
