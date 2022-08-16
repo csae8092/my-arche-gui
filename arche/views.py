@@ -2,7 +2,14 @@ from django.conf import settings
 from django.views.generic import TemplateView
 import json
 
-from arche.arche_utils import fetch_data, top_col_dict, TOP_COL_SIMPLE, resource_to_dict, filter_by_lang
+from arche.arche_utils import (
+    fetch_data,
+    top_col_dict,
+    TOP_COL_SIMPLE,
+    resource_to_dict,
+    filter_by_lang,
+    fetch_children
+)
 
 
 ARCHE_API = settings.ARCHE_API
@@ -43,9 +50,12 @@ class TopColDetailView(TemplateView):
         g = fetch_data(url=url, read_mode='0_0_1_0')
         data = resource_to_dict(g, lang=lang)
         data = filter_by_lang(dict(data[f"{arche_id}"]), lang=lang)
-        # with open(f"asdf__{arche_id}.json", 'w') as file:
-        #     json.dump(data, file, ensure_ascii=False)
+        children = fetch_children(arche_id, lang=lang)
+        if settings.DEBUG:
+            with open(f"asdf__{arche_id}.json", 'w') as file:
+                json.dump(data, file, ensure_ascii=False)
         context["object"] = data
         context["lang"] = lang
         context["arche_id"] = f"{arche_id}"
+        context["children"] = children
         return context

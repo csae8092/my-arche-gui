@@ -1,6 +1,7 @@
 {% extends "arche/base.html" %}
 {% load static %}
 {% block title %} {{ object.title }} {% endblock %}
+{% load django_tables2 %}
 {% block content %}
 <div class="container">
     <div class="card imprint">
@@ -47,6 +48,41 @@
                 </li>
                 {% endfor %}
             </ul>
+            {% if children %}
+            <div class="card">
+                <div class="card-header">
+                    <h3>Children</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        {% for key, item in children.items %}
+                        <tr>
+                                <td>
+                                    <a href="{% url 'arche:top_col_detail' arche_id=key %}{% querystring %}">{{ key }}</a>
+                                </td>
+                                <td>
+                                    {% for prop in item.hasTitle %}
+                                        {{ prop.property__value }}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for prop in item.hasDescription %}
+                                        {{ prop.property__value }}
+                                    {% endfor %}
+                                </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
